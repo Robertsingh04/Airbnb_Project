@@ -74,10 +74,10 @@ if select == "Data Exploration":
             df2= df1[df1["room_type"] == room_ty]
             df2.reset_index(drop= True, inplace= True)
 
-            df_bar= pd.DataFrame(df2.groupby("property_type")[["price","review_scores","number_of_reviews"]].sum())
+            df_bar= pd.DataFrame(df2.groupby("property_type")[["price","review_scores.review_scores_rating","number_of_reviews"]].sum())
             df_bar.reset_index(inplace= True)
 
-            fig_bar= px.bar(df_bar, x='property_type', y= "price", title= "PRICE FOR PROPERTY_TYPES",hover_data=["number_of_reviews","review_scores"],color_discrete_sequence=px.colors.sequential.Redor_r, width=600, height=500)
+            fig_bar= px.bar(df_bar, x='property_type', y= "price", title= "PRICE FOR PROPERTY_TYPES",hover_data=["number_of_reviews","review_scores.review_scores_rating"],color_discrete_sequence=px.colors.sequential.Redor_r, width=600, height=500)
             st.plotly_chart(fig_bar)
 
         
@@ -164,7 +164,7 @@ if select == "Data Exploration":
             df2_a= df1_a[df1_a["property_type"] == property_ty_a]
             df2_a.reset_index(drop= True, inplace= True)
 
-            df_a_sunb_30= px.sunburst(df2_a, path=["room_type","bed_type","is_location_exact"], values="availability_30",width=600,height=500,title="Availability_30",color_discrete_sequence=px.colors.sequential.Peach_r)
+            df_a_sunb_30= px.sunburst(df2_a, path=["room_type","bed_type","location.is_location_exact"], values="availability_30",width=400,height=500,title="Availability_30",color_discrete_sequence=px.colors.sequential.Peach_r)
             st.plotly_chart(df_a_sunb_30)
         
         with col2:
@@ -180,19 +180,19 @@ if select == "Data Exploration":
             st.write("")
             
 
-            df_a_sunb_60= px.sunburst(df2_a, path=["room_type","bed_type","is_location_exact"], values="availability_60",width=600,height=500,title="Availability_60",color_discrete_sequence=px.colors.sequential.Blues_r)
+            df_a_sunb_60= px.sunburst(df2_a, path=["room_type","bed_type","location.is_location_exact"], values="availability_60",width=400,height=500,title="Availability_60",color_discrete_sequence=px.colors.sequential.Blues_r)
             st.plotly_chart(df_a_sunb_60)
 
         col1,col2= st.columns(2)
 
         with col1:
             
-            df_a_sunb_90= px.sunburst(df2_a, path=["room_type","bed_type","is_location_exact"], values="availability_90",width=600,height=500,title="Availability_90",color_discrete_sequence=px.colors.sequential.Aggrnyl_r)
+            df_a_sunb_90= px.sunburst(df2_a, path=["room_type","bed_type","location.is_location_exact"], values="availability_90",width=400,height=500,title="Availability_90",color_discrete_sequence=px.colors.sequential.Aggrnyl_r)
             st.plotly_chart(df_a_sunb_90)
 
         with col2:
 
-            df_a_sunb_365= px.sunburst(df2_a, path=["room_type","bed_type","is_location_exact"], values="availability_365",width=600,height=500,title="Availability_365",color_discrete_sequence=px.colors.sequential.Greens_r)
+            df_a_sunb_365= px.sunburst(df2_a, path=["room_type","bed_type","location.is_location_exact"], values="availability_365",width=400,height=500,title="Availability_365",color_discrete_sequence=px.colors.sequential.Greens_r)
             st.plotly_chart(df_a_sunb_365)
         
         roomtype_a= st.selectbox("Select the Room Type_a", df2_a["room_type"].unique())
@@ -264,46 +264,17 @@ if select == "Data Exploration":
 
         st.dataframe(df_val_sel)
 
-        # checking the correlation
-
-        df_val_sel_corr= df_val_sel.drop(columns=["listing_url","name", "property_type",                 
-                                            "room_type", "bed_type","cancellation_policy",
-                                            "images","host_url","host_name", "host_location",                   
-                                            "host_response_time", "host_thumbnail_url",            
-                                            "host_response_rate","host_is_superhost","host_has_profile_pic" ,         
-                                            "host_picture_url","host_neighbourhood",
-                                            "host_identity_verified","host_verifications",
-                                            "street", "suburb", "government_area", "market",                        
-                                            "country", "country_code","location_type","is_location_exact",
-                                            "amenities"]).corr()
-        
-        st.dataframe(df_val_sel_corr)
-
-        df_val_sel_gr= pd.DataFrame(df_val_sel.groupby("accommodates")[["cleaning_fee","bedrooms","beds","extra_people"]].sum())
-        df_val_sel_gr.reset_index(inplace= True)
-
-        fig_1= px.bar(df_val_sel_gr, x="accommodates", y= ["cleaning_fee","bedrooms","beds"], title="ACCOMMODATES",
-                    hover_data= "extra_people", barmode='group', color_discrete_sequence=px.colors.sequential.Rainbow_r,width=1000)
-        st.plotly_chart(fig_1)
-        
-        
-        room_ty_l= st.selectbox("Select the Room_Type_l", df_val_sel["room_type"].unique())
-
-        df_val_sel_rt= df_val_sel[df_val_sel["room_type"] == room_ty_l]
-
-        fig_2= px.bar(df_val_sel_rt, x= ["street","host_location","host_neighbourhood"],y="market", title="MARKET",
-                    hover_data= ["name","host_name","market"], barmode='group',orientation='h', color_discrete_sequence=px.colors.sequential.Rainbow_r,width=1000)
-        st.plotly_chart(fig_2)
-
-        fig_3= px.bar(df_val_sel_rt, x="government_area", y= ["host_is_superhost","host_neighbourhood","cancellation_policy"], title="GOVERNMENT_AREA",
-                    hover_data= ["guests_included","location_type"], barmode='group', color_discrete_sequence=px.colors.sequential.Rainbow_r,width=1000)
-        st.plotly_chart(fig_3)
-
 
     with tab4:
 
         st.title("GEOSPATIAL VISUALIZATION")
         st.write("")
+
+        def datafr():
+            df= pd.read_csv("D:/GUVI/Integration python with sql/Airbnb.csv")
+            return df
+
+        df_2= datafr()
 
         fig_4 = px.scatter_mapbox(df, lat='latitude', lon='longitude', color='price', size='accommodates',
                         color_continuous_scale= "rainbow",hover_name='name',range_color=(0,49000), mapbox_style="carto-positron",
